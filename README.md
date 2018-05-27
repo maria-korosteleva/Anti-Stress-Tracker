@@ -14,4 +14,5 @@ variable. Add the following lines to your .bashrc file (~/python-fitbit/ is your
 From the root of the project directory run \
 `export FLASK_ENV=development` \
 `export FLASK_APP=init.py` \
-`flask run`
+`flask run`\
+Server running in development mode automatically restarts when code changes.
