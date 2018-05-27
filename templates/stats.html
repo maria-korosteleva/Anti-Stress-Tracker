@@ -6,7 +6,11 @@
 </head>
 <body>
 
-<p>{{ text }}</p>
+<h1>{{ title }}</h1>
+
+{% for elem in stats %}
+<p>You had {{ elem.score }} stress at {{ elem.datetime.date() }} {{ elem.datetime.time() }}</p>
+{% endfor %}
 
 </body>
 </html>
