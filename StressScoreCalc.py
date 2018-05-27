@@ -21,9 +21,9 @@ class StressScoreCalc:
     @staticmethod
     def get_stat_score(start, end, sr):
         fitbit = FitbitWrapper()
-        fitbit.get_heartrate_series(start, end, '1min')
+        heartrate_stats = fitbit.get_heartrate_series(start, end, '1min')
+        scores = []
+        for record in heartrate_stats:
+            scores.append(StressScoreRecord(record.heartrate, record.datetime))
 
-        score_1 = StressScoreRecord(50, dt.datetime(2018, 1, 31, 14, 00, 00))
-        score_2 = StressScoreRecord(60, dt.datetime(2018, 1, 31, 15, 00, 00))
-
-        return score_1, score_2
+        return scores

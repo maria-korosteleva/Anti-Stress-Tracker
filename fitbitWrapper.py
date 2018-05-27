@@ -17,13 +17,18 @@ class FitbitWrapper:
                                     refresh_token=REFRESH_TOKEN)
         return
 
+    def checkAccessToken(self):
+        return
+
     def get_heartrate_series(self, start_date, end_date, detail_level):
+        self.checkAccessToken()
         # start_date
-        stats = self.client.time_series('activities/heart', base_date='2018-05-26', end_date='2018-05-27')
+        stats = self.client.intraday_time_series('activities/heart', base_date='2018-05-26', detail_level=detail_level)
         beauty_stats = []
         for elem in stats['activities-heart-intraday']['dataset']:
-            
-            beauty_stats.append(HeartRateRecord(elem['value'], elem['time']))
+            # get the time in datetime format
+            timestamp = dt.datetime.strptime('2018-05-26'+elem['time'], '%Y-%m-%d%H:%M:%S')
+            beauty_stats.append(HeartRateRecord(elem['value'], timestamp))
         # print stats
         return beauty_stats
         # self.client.intraday_time_series('activities/heart', base_date='2018-05-27', detail_level=detail_level)
