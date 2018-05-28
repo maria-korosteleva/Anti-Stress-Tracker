@@ -8,21 +8,17 @@ app = Flask(__name__)
 
 @app.route("/")
 def stress_score():
-    # Login to fitbit
     # get last availible stress score
-    score = SS.StressScoreCalc.get_last_score()
+    score = SS.get_last_score()
     return render_template('stressScore.html', score=score.value, datetime=score.datetime)
 
 
 @app.route("/today")
 def day_stats():
-    # Login to fitbit if not logined yet
-
     # calc todays stats
-    start_time = dt.datetime(2018, 1, 25)
-    end_time = dt.datetime(2018, 1, 25, 23, 59, 59)
-    interval = dt.time(1, 0, 0)
-    stats = SS.StressScoreCalc.get_stat_score(start_time, end_time, interval)
+    today = dt.datetime.now().date()
+    interval = dt.timedelta(minutes=30)
+    stats = SS.get_stat_score(today, today+dt.timedelta(1), interval)
 
     # output the rendered page
     return render_template('stats.html', title='Today\'s statistics', stats=stats)
@@ -31,10 +27,12 @@ def day_stats():
 @app.route("/week")
 def week_stats():
     # Login to fitbit if not logined yet
-    start_time = dt.datetime(2018, 1, 25)
-    end_time = dt.datetime(2018, 1, 25, 23, 59, 59)
-    interval = dt.time(1, 0, 0)
-    stats = SS.StressScoreCalc.get_stat_score(start_time, end_time, interval)
+    today = dt.datetime.now().date()
+    week_start = today-dt.timedelta(7)
+    interval = dt.timedelta(hours=3)
+    stats = SS.get_stat_score(week_start, today+dt.timedelta(1), interval)
 
+    title = 'Weeks\'s statistics from ' + week_start.strftime("%Y-%b-%d") \
+            + ' to ' + today.strftime("%Y-%b-%d")
     # output the rendered page
-    return render_template('stats.html', title='Weeks\'s statistics', stats=stats)
+    return render_template('stats.html', title=title, stats=stats)

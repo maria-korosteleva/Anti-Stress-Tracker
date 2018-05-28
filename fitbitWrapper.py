@@ -2,20 +2,28 @@ import ConfigParser
 import fitbit
 from RecordClasses import Record
 import datetime as dt
+import time
 
 config_filename = 'config.ini'
 
 
+# returns heartrate stats for a dayrange with start_date included, end_date excluded
 def get_heartrate_series(start_date, end_date, detail_level):
+    if not detail_level in ['1sec', '1min', '15min']:
+        raise ValueError("Period must be either '1sec', '1min', or '15min'")
+
     client = __get_client()
-    # start_date
-    stats = client.intraday_time_series('activities/heart', base_date='2018-05-26', detail_level=detail_level)
     beauty_stats = []
-    for elem in stats['activities-heart-intraday']['dataset']:
-        # get the time in datetime format
-        timestamp = dt.datetime.strptime('2018-05-26'+elem['time'], '%Y-%m-%d%H:%M:%S')
-        beauty_stats.append(Record(elem['value'], timestamp))
-    # print stats
+    for day_number in range((end_date - start_date).days):
+        base_date = start_date+dt.timedelta(day_number)
+        stats = client.intraday_time_series('activities/heart',
+                                            base_date=base_date,
+                                            detail_level=detail_level)
+
+        for elem in stats['activities-heart-intraday']['dataset']:
+            # get the time in datetime format
+            timestamp = dt.datetime.strptime(elem['time'], '%H:%M:%S')
+            beauty_stats.append(Record(elem['value'], dt.datetime.combine(base_date, timestamp.time())))
     return beauty_stats
 
 

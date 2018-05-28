@@ -3,26 +3,39 @@ from RecordClasses import Record
 import fitbitWrapper
 
 
-class StressScoreCalc:
-    def __init__(self):
-        return
+# returns the score level and a timestamp of the last avalible result
+def get_last_score():
+    today = dt.datetime.now().date()
+    heartrate_stats = fitbitWrapper.get_heartrate_series(today, today+dt.timedelta(1), '1min')
+    last_record = heartrate_stats[len(heartrate_stats)-1]
+    return last_record
 
-    # returns the score level and a timestamp of the last avalible result
-    @staticmethod
-    def get_last_score():
-        score = Record(50, dt.datetime(2018, 1, 31, 14, 00, 00))
-        return score
 
-    # params:
-    # start, end - start and end of the time interval
-    # sr defines the distance between samples
-    #
-    # returns regularly distributed samples for a given interval
-    @staticmethod
-    def get_stat_score(start, end, sr):
-        heartrate_stats = fitbitWrapper.get_heartrate_series(start, end, '1min')
-        # scores = []
-        # for record in heartrate_stats:
-        #    scores.append(StressScoreRecord(record.heartrate, record.datetime))
+# params:
+# start, end - start and end of the time interval
+# sr defines the distance between samples
+#
+# returns regularly distributed samples for a given interval, start included, end excluded
+def get_stat_score(start, end, sr):
+    heartrate_stats = fitbitWrapper.get_heartrate_series(start, end, '1min')
 
-        return heartrate_stats
+    return __resample_and_average_timeseries(heartrate_stats, sr)
+
+
+# returns regularly distributed samples for a given samplerate.
+# Values are averaged inside the sample interval
+# if there are no values in the given interval, the value for the sample is set to zero
+def __resample_and_average_timeseries(timeseries, sr):
+    averaged = [timeseries[0]]
+    interval = []
+    start_interval = timeseries[0].datetime
+    for record in timeseries:
+        while record.datetime > start_interval + sr:
+            value = sum(interval) / len(interval) if len(interval) else 0
+            averaged.append(Record(value, start_interval+sr))
+            start_interval = start_interval + sr
+            interval = []
+        else:
+            interval.append(record.value)
+
+    return averaged
