@@ -1,32 +1,41 @@
 import datetime as dt
-from StressScore import StressScore
+from RecordClasses import Record
+import fitbitWrapper
 
 
-class StressScoreCalc:
-    def __init__(self):
-        return
+# returns the score level and a timestamp of the last avalible result
+def get_last_score():
+    today = dt.datetime.now().date()
+    heartrate_stats = fitbitWrapper.get_heartrate_series(today, today+dt.timedelta(1), '1min')
+    last_record = heartrate_stats[len(heartrate_stats)-1]
+    return last_record
 
-    # returns the score level and a timestamp of the last avalible result
-    @staticmethod
-    def get_last_score():
-        score = StressScore()
-        score.score = 50
-        score.datetime = dt.datetime(2018, 1, 31, 14, 00, 00)
-        return score
 
-    # params:
-    # start, end - start and end of the time interval
-    # sr defines the distance between samples
-    #
-    # returns regularly distributed samples for a given interval
-    @staticmethod
-    def get_stat_score(start, end, sr):
-        score_1 = StressScore()
-        score_1.score = 50
-        score_1.datetime = dt.datetime(2018, 1, 31, 14, 00, 00)
+# params:
+# start, end - start and end of the time interval
+# sr defines the distance between samples
+#
+# returns regularly distributed samples for a given interval, start included, end excluded
+def get_stat_score(start, end, sr):
+    heartrate_stats = fitbitWrapper.get_heartrate_series(start, end, '1min')
 
-        score_2 = StressScore()
-        score_2.score = 60
-        score_2.datetime = dt.datetime(2018, 1, 31, 15, 00, 00)
+    return __resample_and_average_timeseries(heartrate_stats, sr)
 
-        return score_1, score_2
+
+# returns regularly distributed samples for a given samplerate.
+# Values are averaged inside the sample interval
+# if there are no values in the given interval, the value for the sample is set to zero
+def __resample_and_average_timeseries(timeseries, sr):
+    averaged = [timeseries[0]]
+    interval = []
+    start_interval = timeseries[0].datetime
+    for record in timeseries:
+        while record.datetime > start_interval + sr:
+            value = sum(interval) / len(interval) if len(interval) else 0
+            averaged.append(Record(value, start_interval+sr))
+            start_interval = start_interval + sr
+            interval = []
+        else:
+            interval.append(record.value)
+
+    return averaged
