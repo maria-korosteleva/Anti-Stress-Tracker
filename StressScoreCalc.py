@@ -1,6 +1,7 @@
 import datetime as dt
-from RecordClasses import StressScoreRecord
+from RecordClasses import Record
 import fitbitWrapper
+
 
 class StressScoreCalc:
     def __init__(self):
@@ -9,7 +10,7 @@ class StressScoreCalc:
     # returns the score level and a timestamp of the last avalible result
     @staticmethod
     def get_last_score():
-        score = StressScoreRecord(50, dt.datetime(2018, 1, 31, 14, 00, 00))
+        score = Record(50, dt.datetime(2018, 1, 31, 14, 00, 00))
         return score
 
     # params:
@@ -20,8 +21,8 @@ class StressScoreCalc:
     @staticmethod
     def get_stat_score(start, end, sr):
         heartrate_stats = fitbitWrapper.get_heartrate_series(start, end, '1min')
-        scores = []
-        for record in heartrate_stats:
-            scores.append(StressScoreRecord(record.heartrate, record.datetime))
+        # scores = []
+        # for record in heartrate_stats:
+        #    scores.append(StressScoreRecord(record.heartrate, record.datetime))
 
-        return scores
+        return heartrate_stats

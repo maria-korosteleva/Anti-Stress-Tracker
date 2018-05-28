@@ -11,7 +11,7 @@ def stress_score():
     # Login to fitbit
     # get last availible stress score
     score = SS.StressScoreCalc.get_last_score()
-    return render_template('stressScore.html', score=score.score, datetime=score.datetime)
+    return render_template('stressScore.html', score=score.value, datetime=score.datetime)
 
 
 @app.route("/today")
