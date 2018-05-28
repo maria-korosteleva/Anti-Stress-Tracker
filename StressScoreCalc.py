@@ -1,7 +1,6 @@
 import datetime as dt
 from RecordClasses import StressScoreRecord
-from fitbitWrapper import FitbitWrapper
-
+import fitbitWrapper
 
 class StressScoreCalc:
     def __init__(self):
@@ -20,8 +19,7 @@ class StressScoreCalc:
     # returns regularly distributed samples for a given interval
     @staticmethod
     def get_stat_score(start, end, sr):
-        fitbit = FitbitWrapper()
-        heartrate_stats = fitbit.get_heartrate_series(start, end, '1min')
+        heartrate_stats = fitbitWrapper.get_heartrate_series(start, end, '1min')
         scores = []
         for record in heartrate_stats:
             scores.append(StressScoreRecord(record.heartrate, record.datetime))
