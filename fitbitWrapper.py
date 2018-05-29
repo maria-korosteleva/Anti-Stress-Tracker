@@ -6,9 +6,9 @@ import time
 
 config_filename = 'config.ini'
 
-
+# start_time and end_time should both be empty or both set
 # returns heartrate stats for a dayrange with start_date included, end_date excluded
-def get_heartrate_series(start_date, end_date, detail_level):
+def get_heartrate_series(start_date, end_date, detail_level, start_time=None, end_time=None):
     if not detail_level in ['1sec', '1min', '15min']:
         raise ValueError("Period must be either '1sec', '1min', or '15min'")
 
@@ -16,9 +16,11 @@ def get_heartrate_series(start_date, end_date, detail_level):
     beauty_stats = []
     for day_number in range((end_date - start_date).days):
         base_date = start_date+dt.timedelta(day_number)
-        stats = client.intraday_time_series('activities/heart',
-                                            base_date=base_date,
-                                            detail_level=detail_level)
+        if start_time:
+            stats = client.intraday_time_series('activities/heart', base_date=base_date, detail_level=detail_level,
+                                                start_time=start_time, end_time=end_time)
+        else:
+            stats = client.intraday_time_series('activities/heart', base_date=base_date, detail_level=detail_level)
 
         for elem in stats['activities-heart-intraday']['dataset']:
             # get the time in datetime format
