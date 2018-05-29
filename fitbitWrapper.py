@@ -30,10 +30,10 @@ def get_heartrate_series(start_date, end_date, detail_level):
 # Private methods #
 def __store_token(token_dict):
     # Function for refreshing access_token, refresh_token, and expires_at.
-    file_config = open(config_filename, 'w')
     config = ConfigParser.SafeConfigParser()
     config.read(config_filename)
 
+    file_config = open(config_filename, 'w')
     config.set('Login Parameters', 'ACCESS_TOKEN', token_dict['access_token'])
     config.set('Login Parameters', 'REFRESH_TOKEN', token_dict['refresh_token'])
     config.set('Login Parameters', 'EXPIRES_AT', str(int(token_dict['expires_at'])))
