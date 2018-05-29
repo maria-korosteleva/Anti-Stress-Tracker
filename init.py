@@ -10,7 +10,7 @@ app = Flask(__name__)
 def stress_score():
     # get last availible stress score
     score = SS.get_last_score()
-    return render_template('stressScore.html', score=score.value, datetime=score.datetime)
+    return render_template('stressScore.html', score=score.value, datetime=score.datetime, sleep=score.sleep)
 
 
 @app.route("/today")

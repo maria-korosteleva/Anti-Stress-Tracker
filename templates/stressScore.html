@@ -8,6 +8,7 @@
 
 <h1> Stress level: {{ score }} </h1>
 <h2> Time updated: {{ datetime.date() }}, {{ datetime.time() }} </h2>
+<h3> You were {% if sleep %} Sleeping! {% else %} Awake! {% endif %} </h3>
 
 </body>
 </html>

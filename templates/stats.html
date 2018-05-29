@@ -9,7 +9,10 @@
 <h1>{{ title }}</h1>
 
 {% for elem in stats %}
-<p>You had {{ elem.value }} stress at {{ elem.datetime.date() }} {{ elem.datetime.time() }}</p>
+<p>You had {{ elem.value }} stress
+    at {{ elem.datetime.date() }} {{ elem.datetime.time() }}
+    and you were {% if elem.sleep %} Sleeping! {% else %} Awake! {% endif %}
+</p>
 {% endfor %}
 
 </body>
