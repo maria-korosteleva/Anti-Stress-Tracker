@@ -27,6 +27,22 @@ def get_heartrate_series(start_date, end_date, detail_level):
     return beauty_stats
 
 
+# returns sleeping ranges (start-end time of the sleep) for given dates, end date excluded
+# includes both night sleep and naps
+def get_sleep_ranges(start_date, end_date):
+    client = __get_client()
+    beauty_stats = []
+    for day_number in range((end_date - start_date).days):
+        base_date = start_date+dt.timedelta(day_number)
+        stats = client.sleep(date=base_date)['sleep']
+        for elem in stats:
+            start = dt.datetime.strptime(elem['startTime'].split('.')[0], "%Y-%m-%dT%H:%M:%S")
+            duration = dt.timedelta(minutes=elem['timeInBed'])
+            end = start + duration
+            beauty_stats.append((start, end))
+    return beauty_stats
+
+
 # Private methods #
 def __store_token(token_dict):
     # Function for refreshing access_token, refresh_token, and expires_at.
