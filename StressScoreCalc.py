@@ -40,7 +40,11 @@ def get_stat_score(start_date, end_date, sr):
         base_date = start_date + dt.timedelta(day_number)
         heartrate_stats = fitbitWrapper.get_heartrate_series(base_date, '1sec')
         if heartrate_stats:
-            stress_stats.extend(__resample_timeseries_and_get_stress_score(heartrate_stats, sr, end_of_the_day=True))
+            if day_number == (end_date - start_date).days - 1:
+                stress_stats.extend(__resample_timeseries_and_get_stress_score(heartrate_stats, sr))
+            else:
+                stress_stats.extend(
+                    __resample_timeseries_and_get_stress_score(heartrate_stats, sr, end_of_the_day=True))
 
     sleeps = fitbitWrapper.get_sleep_ranges(start_date, end_date + dt.timedelta(1))
     if sleeps:
