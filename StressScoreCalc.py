@@ -2,22 +2,24 @@ import datetime as dt
 from RecordClasses import Record
 import fitbitWrapper
 
+ss_duration = dt.timedelta(minutes=2)   # minutes
+ss_estimated_length = 10                # need at least these amount of records to evaluate the ss
+
 
 # returns the score level and a timestamp of the last avalible result
 def get_last_score():
     today = dt.datetime.now().date()
     # get the info of the last sync time
-    heartrate_stats = fitbitWrapper.get_heartrate_series(today, today+dt.timedelta(1), '1min')
+    heartrate_stats = fitbitWrapper.get_heartrate_series(today, '1min')
     last_record = heartrate_stats[len(heartrate_stats)-1]
     # get precise heartrate data
-    timerange = (last_record.datetime - dt.timedelta(minutes=2), last_record.datetime)
-    heartrate_stats = fitbitWrapper.get_heartrate_series(today, today + dt.timedelta(1), '1sec',
-                                                         start_time=timerange[0], end_time=timerange[1])
+    timerange = (last_record.datetime - ss_duration, last_record.datetime)
+    heartrate_stats = fitbitWrapper.get_heartrate_series(today, '1sec', start_time=timerange[0], end_time=timerange[1])
 
     # calculate the stress level
     # assume that we have a continuous data on the heartrate (without breaks)
     hr_values = [r.value for r in heartrate_stats]
-    score = Record(__stress_score(hr_values), last_record.datetime)
+    score = Record(int(__stress_score(hr_values)), last_record.datetime)
 
     sleeps = fitbitWrapper.get_sleep_ranges(today, today+dt.timedelta(1))
     if sleeps:
@@ -32,33 +34,66 @@ def get_last_score():
 # sr defines the distance between samples
 #
 # returns regularly distributed samples for a given interval, start included, end excluded
-def get_stat_score(start, end, sr):
-    heartrate_stats = fitbitWrapper.get_heartrate_series(start, end, '1min')
-    sleeps = fitbitWrapper.get_sleep_ranges(start, end + dt.timedelta(1))
-    heartrate_stats = __resample_and_average_timeseries(heartrate_stats, sr)
+def get_stat_score(start_date, end_date, sr):
+    stress_stats = []
+    for day_number in range((end_date - start_date).days):
+        base_date = start_date + dt.timedelta(day_number)
+        heartrate_stats = fitbitWrapper.get_heartrate_series(base_date, '1sec')
+        if heartrate_stats:
+            stress_stats.extend(__resample_timeseries_and_get_stress_score(heartrate_stats, sr, end_of_the_day=True))
+
+    sleeps = fitbitWrapper.get_sleep_ranges(start_date, end_date + dt.timedelta(1))
     if sleeps:
-        heartrate_stats = __check_sleeping_records(heartrate_stats, sleeps)
+        stress_stats = __check_sleeping_records(stress_stats, sleeps)
 
-    return heartrate_stats
+    return stress_stats
 
-
-# returns regularly distributed samples for a given samplerate.
-# Values are averaged inside the sample interval
+# params: timeseries are assumed to be sorted with respect to time
+# sr is assumed to be a divisor of the number of minutes in the day (24*60)
+# end_of_the_day indicates if the result should be extended till the end of the day of the final recording
+#
+# returns regularly distributed samples of stress score for a given sample rate, \
+# starting from mignight of the first day of the avalible recordings
+# Values are averaged inside the sample interval, stress score is calculated on the fly
 # if there are no values in the given interval, the value for the sample is set to zero
-def __resample_and_average_timeseries(timeseries, sr):
-    averaged = [timeseries[0]]
-    interval = []
-    start_interval = timeseries[0].datetime
+#
+# Optimized to go through the timeseries only once
+def __resample_timeseries_and_get_stress_score(timeseries, sr, end_of_the_day=False):
+    averaged = []
+    averaged_interval = []
+    ss_interval = []
+    # start_interval = timeseries[0].datetime
+    # ss_start_interval = timeseries[0].datetime
+    start_interval = dt.datetime.combine(timeseries[0].datetime.date(), dt.time(0, 0, 0))
+    ss_start_interval = dt.datetime.combine(timeseries[0].datetime.date(), dt.time(0, 0, 0))
     for record in timeseries:
         while record.datetime > start_interval + sr:
-            value = sum(interval) / len(interval) if len(interval) else 0
-            averaged.append(Record(value, start_interval+sr))
+            value = sum(averaged_interval) / len(averaged_interval) if len(averaged_interval) else 0
+            value = int(round(value))
+            averaged.append(Record(value, start_interval + sr))
             start_interval = start_interval + sr
-            interval = []
+            averaged_interval = []
+            ss_start_interval = start_interval
+            ss_interval = []
         else:
-            interval.append(record.value)
+            while record.datetime > ss_start_interval + ss_duration:
+                score = __stress_score(ss_interval)
+                if score:
+                    averaged_interval.append(score)
+                ss_start_interval = ss_start_interval + ss_duration
+                ss_interval = []
+            else:
+                ss_interval.append(record.value)
+    last_day_ends = dt.datetime.combine(averaged[-1].datetime.date(), dt.time(23, 59, 59))
+    if end_of_the_day:
+        while averaged[-1].datetime < last_day_ends:
+            averaged.append(Record(0, averaged[-1].datetime + sr))
 
     return averaged
+
+# params: timeseries is considered to be sampled with samplerate
+def __fill_the_blancs(timeseries, sr):
+    return
 
 
 # for every intro in timeseries check if the person was sleeping at the moment
@@ -77,18 +112,9 @@ def __check_sleeping_records(timeseries, sleep_ranges):
     return timeseries
 
 
-# returns last (interval) of timeseries
-def __cut_timeseries(timeseries, interval):
-    last_time = timeseries[-1].datetime
-    record_id = len(timeseries) - 1
-    while timeseries[record_id].datetime > last_time - interval:
-        record_id -= 1
-    return timeseries[record_id:]
-
-
 # params: series of the heartrate records. Each record is assumed to be significant (non-zero)
 # and all records are assumed to be equally and densely dustributed in time domain
-# returns estimated score for a given series of heartrate records
+# returns estimated score for a given series of heartrate records or 0 if it cannot be estimated
 def __stress_score(hr):
     # see http://www.cardiometry.net/issues/no10-may-2017/heart-rate-variability-analysis
     # originally from book https://www.twirpx.com/file/2327193/ (in Russian)
@@ -97,6 +123,9 @@ def __stress_score(hr):
     # Mo - mode - most frequent R-R interval value
     # AMo - mode amplitude - % of the intervals corresponding to Mode
     # VR - variational range - difference  between min and max R-R intervals
+    if len(hr) < ss_estimated_length:
+        return 0
+
     r_r = [round(60./float(r), 3) for r in hr]
 
     # naive calculations, might be improved
@@ -114,8 +143,8 @@ def __stress_score(hr):
             mode_freq = freq
             mode = record
     # DEBUG
-    print r_r
-    print min, max, mode, mode_freq
+    # print r_r
+    # print min, max, mode, mode_freq
 
     VR = max - min
     Amode = mode_freq / float(len(r_r)) * 100
