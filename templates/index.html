@@ -89,7 +89,7 @@
                         "captionFontSize": "25",
                         "subCaption": "{{ today }}",
                         "subcaptionFontSize": "20",
-                        "yaxisminvalue": "0",
+                        "yaxisminvalue": "1",
                         "yaxismaxvalue": "1000",
                         "lineThickness": "2",
                         "paletteColors": "#0075c2",
@@ -112,12 +112,16 @@
                         "rotateLabels": "1",
                         "slantLabels": "1",
                         "showHoverEffect": "1",
-                        "canvasPadding": "10"
+                        "canvasPadding": "10",
+                        "showValues": "0",
+                        "connectNullData": "0"
                     },
                     "data": parsed,
                     "trendlines": [{
                         "line": [{
                             "startvalue": "50",
+                            "endvalue": "200",
+                            "istrendzone": "1",
                             "color": "#5671ff",
                             "displayvalue": "Calm",
                             "valueOnRight": "1",
