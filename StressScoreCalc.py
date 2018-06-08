@@ -3,7 +3,6 @@ from RecordClasses import Record
 import fitbitWrapper
 
 ss_duration = dt.timedelta(minutes=2)  # minutes
-ss_estimated_length = 10  # need at least these amount of records to evaluate the ss
 
 
 # returns the score level and a timestamp of the last avalible result
@@ -129,10 +128,11 @@ def __stress_score(hr):
     # Mo - mode - most frequent R-R interval value
     # AMo - mode amplitude - % of the intervals corresponding to Mode
     # VR - variational range - difference  between min and max R-R intervals
-    if len(hr) < ss_estimated_length:
-        return 0
 
     r_r = [round(60. / float(r), 3) for r in hr]
+
+    if len(r_r) == 0:
+        return 0  # give up to calculate the score to prevent division by zero
 
     # naive calculations, might be improved
     min = 200
@@ -155,6 +155,7 @@ def __stress_score(hr):
     VR = max - min
     Amode = mode_freq / float(len(r_r)) * 100
 
-    # TODO : [ZeroDivisionError: float division by zero]
+    if abs(VR) < 0.0001:
+        return 0  # give up to calculate the score to prevent division by zero
 
     return round(Amode / (2 * VR * mode))
