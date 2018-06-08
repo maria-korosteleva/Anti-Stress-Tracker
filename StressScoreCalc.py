@@ -2,8 +2,8 @@ import datetime as dt
 from RecordClasses import Record
 import fitbitWrapper
 
-ss_duration = dt.timedelta(minutes=2)   # minutes
-ss_estimated_length = 10                # need at least these amount of records to evaluate the ss
+ss_duration = dt.timedelta(minutes=2)  # minutes
+ss_estimated_length = 10  # need at least these amount of records to evaluate the ss
 
 
 # returns the score level and a timestamp of the last avalible result
@@ -11,7 +11,7 @@ def get_last_score():
     today = dt.datetime.now().date()
     # get the info of the last sync time
     heartrate_stats = fitbitWrapper.get_heartrate_series(today, '1min')
-    last_record = heartrate_stats[len(heartrate_stats)-1]
+    last_record = heartrate_stats[len(heartrate_stats) - 1]
     # get precise heartrate data
     timerange = (last_record.datetime - ss_duration, last_record.datetime)
     heartrate_stats = fitbitWrapper.get_heartrate_series(today, '1sec', start_time=timerange[0], end_time=timerange[1])
@@ -21,7 +21,7 @@ def get_last_score():
     hr_values = [r.value for r in heartrate_stats]
     score = Record(int(__stress_score(hr_values)), last_record.datetime)
 
-    sleeps = fitbitWrapper.get_sleep_ranges(today, today+dt.timedelta(1))
+    sleeps = fitbitWrapper.get_sleep_ranges(today, today + dt.timedelta(1))
     if sleeps:
         if score.datetime < sleeps[-1][1]:
             score.sleep = True
@@ -51,6 +51,7 @@ def get_stat_score(start_date, end_date, sr):
         stress_stats = __check_sleeping_records(stress_stats, sleeps)
 
     return stress_stats
+
 
 # params: timeseries are assumed to be sorted with respect to time
 # sr is assumed to be a divisor of the number of minutes in the day (24*60)
@@ -95,6 +96,7 @@ def __resample_timeseries_and_get_stress_score(timeseries, sr, end_of_the_day=Fa
 
     return averaged
 
+
 # params: timeseries is considered to be sampled with samplerate
 def __fill_the_blancs(timeseries, sr):
     return
@@ -130,7 +132,7 @@ def __stress_score(hr):
     if len(hr) < ss_estimated_length:
         return 0
 
-    r_r = [round(60./float(r), 3) for r in hr]
+    r_r = [round(60. / float(r), 3) for r in hr]
 
     # naive calculations, might be improved
     min = 200
@@ -152,5 +154,7 @@ def __stress_score(hr):
 
     VR = max - min
     Amode = mode_freq / float(len(r_r)) * 100
+
+    # TODO : [ZeroDivisionError: float division by zero]
 
     return round(Amode / (2 * VR * mode))

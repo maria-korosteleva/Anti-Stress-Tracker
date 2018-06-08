@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Anti-Stree-Tracker</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+
+    <meta http-equiv="Content-Type" content="text/html">
+    <meta charset="utf-8" http-equiv="X-UA-Compatible" content="IE=edge, chrome=1"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.js"></script>
+    <script type="text/javascript"
+            src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.fint.js?cacheBust=56"></script>
+    <script type="text/javascript">
+
+        {# https://www.fusioncharts.com/dev/chart-guide/gauges-and-widgets/linear-gauge #}
+        {# Current stress score gauge chart #}
+        FusionCharts.ready(function () {
+            var fusioncharts = new FusionCharts({
+                    type: 'hlineargauge',
+                    renderAt: 'gauge-chart-container',
+                    id: 'cpu-linear-gauge-1',
+                    width: '650',
+                    height: '150',
+                    dataFormat: 'json',
+                    dataSource: {
+                        "chart": {
+                            "theme": "fint",
+                            "caption": "Current Stress Score",
+                            "captionFontSize": "25",
+                            {#"subcaption": "food.hsm.com",#}
+                            "lowerLimit": "0",
+                            "upperLimit": "750",
+                            {#"numberSuffix": "%",#}
+                            "chartBottomMargin": "20",
+                            "valueFontSize": "20",
+                            "valueFontBold": "0",
+                            "labelFontSize": "18",
+                        },
+                        "colorRange": {
+                            "color": [{
+                                "minValue": "0",
+                                "maxValue": "30",
+                                "code": "#f0fff1",
+                                "label": "Mild stress",
+                            }, {
+                                "minValue": "30",
+                                "maxValue": "200",
+                                "code": "#64ffcd",
+                                "label": "Calm",
+                            }, {
+                                "minValue": "200",
+                                "maxValue": "500",
+                                "code": "#f3ff16",
+                                "label": "Mild stress",
+                            }, {
+                                "minValue": "500",
+                                "maxValue": "750",
+                                "code": "#ff854c",
+                                "label": "Danger",
+                            }]
+                        },
+                        "pointers": {
+                            "pointer": [{
+                                "value": {{ score }}
+                                {#"value": "180"#}
+                            }]
+                        }
+                    }
+                }
+            );
+            fusioncharts.render();
+        });
+
+        {# https://www.fusioncharts.com/dev/demos/chart-gallery#chart=3 #}
+        {# Today's stress score gauge chart #}
+        FusionCharts.ready(function () {
+            var parsed = JSON.parse('{{ today_stats | tojson }}')
+            var todayAvgBallChart = new FusionCharts({
+                type: 'line',
+                renderAt: 'today-chart-container',
+                width: '100%',
+                height: '550',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "caption": "Today's Stress Score",
+                        "captionFontSize": "25",
+                        "subCaption": "{{ today }}",
+                        "subcaptionFontSize": "20",
+                        "yaxisminvalue": "0",
+                        "yaxismaxvalue": "1000",
+                        "lineThickness": "2",
+                        "paletteColors": "#0075c2",
+                        "baseFontColor": "#333333",
+                        "baseFont": "Helvetica Neue, Arial",
+                        "showBorder": "0",
+                        "bgColor": "#ffffff",
+                        "showShadow": "0",
+                        "canvasBgColor": "#ffffff",
+                        "canvasBorderAlpha": "0",
+                        "divlineAlpha": "100",
+                        "divlineColor": "#999999",
+                        "divlineThickness": "1",
+                        "divLineDashed": "1",
+                        "divLineDashLen": "1",
+                        "showXAxisLine": "1",
+                        "xAxisLineThickness": "1",
+                        "xAxisLineColor": "#999999",
+                        "showAlternateHGridColor": "0",
+                        "rotateLabels": "1",
+                        "slantLabels": "1",
+                        "showHoverEffect": "1",
+                        "canvasPadding": "10"
+                    },
+                    "data": parsed,
+                    "trendlines": [{
+                        "line": [{
+                            "startvalue": "50",
+                            "color": "#5671ff",
+                            "displayvalue": "Calm",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "200",
+                            "color": "#ff822f",
+                            "displayvalue": "Mild Stress",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "500",
+                            "color": "#ff392b",
+                            "displayvalue": "Danger",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }]
+                    }]
+                },
+            }).render();
+        });
+
+        {# https://www.fusioncharts.com/dev/demos/chart-gallery#chart=3 #}
+        {# Week's stress score gauge chart #}
+        FusionCharts.ready(function () {
+            var parsed = JSON.parse('{{ week_stats | tojson }}')
+            var weekAvgBallChart = new FusionCharts({
+                type: 'line',
+                renderAt: 'week-chart-container',
+                width: '100%',
+                height: '550',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "caption": "Week's Stress Score",
+                        "captionFontSize": "25",
+                        "subCaption": "{{ today }}",
+                        "subcaptionFontSize": "20",
+                        "yaxisminvalue": "0",
+                        "yaxismaxvalue": "1000",
+                        "lineThickness": "2",
+                        "paletteColors": "#0075c2",
+                        "baseFontColor": "#333333",
+                        "baseFont": "Helvetica Neue, Arial",
+                        "showBorder": "0",
+                        "bgColor": "#ffffff",
+                        "showShadow": "0",
+                        "canvasBgColor": "#ffffff",
+                        "canvasBorderAlpha": "0",
+                        "divlineAlpha": "100",
+                        "divlineColor": "#999999",
+                        "divlineThickness": "1",
+                        "divLineDashed": "1",
+                        "divLineDashLen": "1",
+                        "showXAxisLine": "1",
+                        "xAxisLineThickness": "1",
+                        "xAxisLineColor": "#999999",
+                        "showAlternateHGridColor": "0",
+                        "rotateLabels": "1",
+                        "slantLabels": "1",
+                        "showHoverEffect": "1",
+                        "canvasPadding": "10"
+                    },
+                    "data": parsed,
+                    "trendlines": [{
+                        "line": [{
+                            "startvalue": "50",
+                            "color": "#5671ff",
+                            "displayvalue": "Calm",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "200",
+                            "color": "#ff822f",
+                            "displayvalue": "Mild Stress",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "500",
+                            "color": "#ff392b",
+                            "displayvalue": "Danger",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }]
+                    }]
+                },
+            }).render();
+        });
+
+        var TabBlock = {
+            s: {
+                animLen: 200
+            },
+
+            init: function () {
+                TabBlock.bindUIActions();
+                TabBlock.hideInactive();
+            },
+
+            bindUIActions: function () {
+                $('.tabBlock-tabs').on('click', '.tabBlock-tab', function () {
+                    TabBlock.switchTab($(this));
+                });
+            },
+
+            hideInactive: function () {
+                var $tabBlocks = $('.tabBlock');
+
+                $tabBlocks.each(function (i) {
+                    var
+                        $tabBlock = $($tabBlocks[i]),
+                        $panes = $tabBlock.find('.tabBlock-pane'),
+                        $activeTab = $tabBlock.find('.tabBlock-tab.is-active');
+
+                    $panes.hide();
+                    $($panes[$activeTab.index()]).show();
+                });
+            },
+
+            switchTab: function ($tab) {
+                var $context = $tab.closest('.tabBlock');
+
+                if (!$tab.hasClass('is-active')) {
+                    $tab.siblings().removeClass('is-active');
+                    $tab.addClass('is-active');
+
+                    TabBlock.showPane($tab.index(), $context);
+                }
+            },
+
+            showPane: function (i, $context) {
+                var $panes = $context.find('.tabBlock-pane');
+
+                // Normally I'd frown at using jQuery over CSS animations, but we can't transition between unspecified variable heights, right? If you know a better way, I'd love a read it in the comments or on Twitter @johndjameson
+                $panes.slideUp(TabBlock.s.animLen);
+                $($panes[i]).slideDown(TabBlock.s.animLen);
+            }
+        };
+
+        $(function () {
+            TabBlock.init();
+        });
+    </script>
+</head>
+
+<body class="default">
+    <figure class="tabBlock">
+        <ul class="tabBlock-tabs">
+            <li class="tabBlock-tab is-active">Now</li>
+            <li class="tabBlock-tab">Today</li>
+            <li class="tabBlock-tab">Week</li>
+        </ul>
+        <div class="tabBlock-content">
+            <div class="tabBlock-pane">
+                {% if score <= 30 %}
+                    <img src="{{ url_for('static', filename='img/low.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% elif score <= 200 %}
+                    <img src="{{ url_for('static', filename='img/calm.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% elif score <= 500 %}
+                    <img src="{{ url_for('static', filename='img/mid.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% else %}
+                    <img src="{{ url_for('static', filename='img/high.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% endif %}
+                <div id="gauge-chart-container">Stress score gauge will load here!</div>
+                <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
+
+            </div>
+
+            <div class="tabBlock-pane">
+                <div id="today-chart-container">Today score plot will load here!</div>
+                <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
+            </div>
+
+            <div class="tabBlock-pane">
+                <div id="week-chart-container">Week score gauge will load here!</div>
+                <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
+            </div>
+        </div>
+    </figure>
+</body>
+</html>
