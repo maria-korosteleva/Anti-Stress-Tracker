@@ -7,12 +7,34 @@ import fitbit
 app = Flask(__name__)
 app.static_folder = 'static'
 
+
+# @app.route("/")
+# def stress_score():
+#     # get last availible stress score
+#     try:
+#         score = SS.get_last_score()
+#         return render_template('index.html', score=score.value, datetime=score.datetime, sleep=score.sleep)
+#
+#     except fitbit.exceptions.HTTPTooManyRequests as exc:
+#         message = "Retry after " + str(exc.retry_after_sec / 60) + " minutes"
+#         return render_template('error.html', error=message)
+
 @app.route("/")
 def stress_score():
-    # get last availible stress score
     try:
+        # get last availible stress score
         score = SS.get_last_score()
-        return render_template('index.html', score=score.value, datetime=score.datetime, sleep=score.sleep)
+
+        # calc todays stats
+        today = dt.datetime.now().date()
+        interval = dt.timedelta(minutes=15)
+
+        today_stats = SS.get_stat_score(today, today + dt.timedelta(1), interval)
+        today_stats = [{"label": stat.datetime.time().__str__()[:-3], "value": stat.value} for stat in today_stats]
+
+        return render_template('index.html', score=score.value, datetime=score.datetime, sleep=score.sleep,
+                               stats=today_stats, today=today)
+
     except fitbit.exceptions.HTTPTooManyRequests as exc:
         message = "Retry after " + str(exc.retry_after_sec / 60) + " minutes"
         return render_template('error.html', error=message)
@@ -27,7 +49,9 @@ def day_stats():
         stats = SS.get_stat_score(today, today + dt.timedelta(1), interval)
         # output the rendered page
 
-        print(stats)
+        # print(stats)
+        for stat in stats:
+            print(stat.value, stat.datetime, stat.sleep)
 
         return render_template('stats.html', title='Today\'s statistics', stats=stats)
     except fitbit.exceptions.HTTPTooManyRequests as exc:

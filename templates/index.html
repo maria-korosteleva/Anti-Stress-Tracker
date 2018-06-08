@@ -13,10 +13,12 @@
     <script type="text/javascript"
             src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.fint.js?cacheBust=56"></script>
     <script type="text/javascript">
+
+        {# Current stress score gauge chart #}
         FusionCharts.ready(function () {
             var fusioncharts = new FusionCharts({
                     type: 'hlineargauge',
-                    renderAt: 'chart-container',
+                    renderAt: 'gauge-chart-container',
                     id: 'cpu-linear-gauge-1',
                     width: '650',
                     height: '150',
@@ -68,6 +70,77 @@
                 }
             );
             fusioncharts.render();
+        });
+
+        FusionCharts.ready(function () {
+            var parsed = JSON.parse('{{ stats | tojson }}')
+            var avgBallChart = new FusionCharts({
+                type: 'line',
+                renderAt: 'today-chart-container',
+                width: '100%',
+                height: '550',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "caption": "Today's Stress Score",
+                        "captionFontSize": "25",
+                        "subCaption": "{{ today }}",
+                        "subcaptionFontSize": "20",
+                        "yaxisminvalue": "0",
+                        "yaxismaxvalue": "1000",
+                        "lineThickness": "2",
+                        "paletteColors": "#0075c2",
+                        "baseFontColor": "#333333",
+                        "baseFont": "Helvetica Neue,Arial",
+                        "showBorder": "0",
+                        "bgColor": "#ffffff",
+                        "showShadow": "0",
+                        "canvasBgColor": "#ffffff",
+                        "canvasBorderAlpha": "0",
+                        "divlineAlpha": "100",
+                        "divlineColor": "#999999",
+                        "divlineThickness": "1",
+                        "divLineDashed": "1",
+                        "divLineDashLen": "1",
+                        "showXAxisLine": "1",
+                        "xAxisLineThickness": "1",
+                        "xAxisLineColor": "#999999",
+                        "showAlternateHGridColor": "0",
+                        "rotateLabels": "1",
+                        "slantLabels": "1",
+                        "showHoverEffect": "1",
+                        "canvasPadding": "10",
+                        {#"bgColor": "#ffffff",#}
+                        {#"canvasBgColor": "#ffffff",#}
+                        {#"showaxislines": "1",#}
+                        {#"anchorRadius": "4",#}
+                        {#"anchorBgColor": "#ffffff",#}
+                        {#"anchorHoverRadius": "8",#}
+                    },
+                    "data": parsed,
+                    "trendlines": [{
+                        "line": [{
+                            "startvalue": "50",
+                            "color": "#5671ff",
+                            "displayvalue": "Calm",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "200",
+                            "color": "#ff822f",
+                            "displayvalue": "Mild Stress",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "500",
+                            "color": "#ff392b",
+                            "displayvalue": "Danger",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }]
+                    }]
+                },
+            }).render();
         });
 
         var TabBlock = {
@@ -148,25 +221,19 @@
                     <img src="{{ url_for('static', filename='img/high.gif') }}" width="400px" height="400px"
                          id="status-gif"/>
                 {% endif %}
-                <div id="chart-container">Stress score gauge will load here!</div>
+                <div id="gauge-chart-container">Stress score gauge will load here!</div>
                 <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
 
             </div>
 
             <div class="tabBlock-pane">
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias molestiae atque quis blanditiis
-                    eaque maiores ducimus optio neque debitis quos dolorum odit unde quibusdam tenetur quaerat magni
-                    eius quod tempore.</p>
+                <div id="today-chart-container">Today score plot will load here!</div>
+                <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
             </div>
 
             <div class="tabBlock-pane">
-                <ul>
-                    <li>Lorem ipsum dolor sit amet.</li>
-                    <li>Minima mollitia tenetur nesciunt modi?</li>
-                    <li>Id sint fugit et sapiente.</li>
-                    <li>Nam deleniti libero obcaecati pariatur.</li>
-                    <li>Nemo optio iste labore similique?</li>
-                </ul>
+                <div id="week-chart-container">Week score gauge will load here!</div>
+                <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
             </div>
         </div>
     </figure>
