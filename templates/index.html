@@ -14,6 +14,7 @@
             src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.fint.js?cacheBust=56"></script>
     <script type="text/javascript">
 
+        {# https://www.fusioncharts.com/dev/chart-guide/gauges-and-widgets/linear-gauge #}
         {# Current stress score gauge chart #}
         FusionCharts.ready(function () {
             var fusioncharts = new FusionCharts({
@@ -72,9 +73,11 @@
             fusioncharts.render();
         });
 
+        {# https://www.fusioncharts.com/dev/demos/chart-gallery#chart=3 #}
+        {# Today's stress score gauge chart #}
         FusionCharts.ready(function () {
-            var parsed = JSON.parse('{{ stats | tojson }}')
-            var avgBallChart = new FusionCharts({
+            var parsed = JSON.parse('{{ today_stats | tojson }}')
+            var todayAvgBallChart = new FusionCharts({
                 type: 'line',
                 renderAt: 'today-chart-container',
                 width: '100%',
@@ -91,7 +94,7 @@
                         "lineThickness": "2",
                         "paletteColors": "#0075c2",
                         "baseFontColor": "#333333",
-                        "baseFont": "Helvetica Neue,Arial",
+                        "baseFont": "Helvetica Neue, Arial",
                         "showBorder": "0",
                         "bgColor": "#ffffff",
                         "showShadow": "0",
@@ -109,13 +112,74 @@
                         "rotateLabels": "1",
                         "slantLabels": "1",
                         "showHoverEffect": "1",
-                        "canvasPadding": "10",
-                        {#"bgColor": "#ffffff",#}
-                        {#"canvasBgColor": "#ffffff",#}
-                        {#"showaxislines": "1",#}
-                        {#"anchorRadius": "4",#}
-                        {#"anchorBgColor": "#ffffff",#}
-                        {#"anchorHoverRadius": "8",#}
+                        "canvasPadding": "10"
+                    },
+                    "data": parsed,
+                    "trendlines": [{
+                        "line": [{
+                            "startvalue": "50",
+                            "color": "#5671ff",
+                            "displayvalue": "Calm",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "200",
+                            "color": "#ff822f",
+                            "displayvalue": "Mild Stress",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "500",
+                            "color": "#ff392b",
+                            "displayvalue": "Danger",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }]
+                    }]
+                },
+            }).render();
+        });
+
+        {# https://www.fusioncharts.com/dev/demos/chart-gallery#chart=3 #}
+        {# Week's stress score gauge chart #}
+        FusionCharts.ready(function () {
+            var parsed = JSON.parse('{{ week_stats | tojson }}')
+            var weekAvgBallChart = new FusionCharts({
+                type: 'line',
+                renderAt: 'week-chart-container',
+                width: '100%',
+                height: '550',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "caption": "Week's Stress Score",
+                        "captionFontSize": "25",
+                        "subCaption": "{{ today }}",
+                        "subcaptionFontSize": "20",
+                        "yaxisminvalue": "0",
+                        "yaxismaxvalue": "1000",
+                        "lineThickness": "2",
+                        "paletteColors": "#0075c2",
+                        "baseFontColor": "#333333",
+                        "baseFont": "Helvetica Neue, Arial",
+                        "showBorder": "0",
+                        "bgColor": "#ffffff",
+                        "showShadow": "0",
+                        "canvasBgColor": "#ffffff",
+                        "canvasBorderAlpha": "0",
+                        "divlineAlpha": "100",
+                        "divlineColor": "#999999",
+                        "divlineThickness": "1",
+                        "divLineDashed": "1",
+                        "divLineDashLen": "1",
+                        "showXAxisLine": "1",
+                        "xAxisLineThickness": "1",
+                        "xAxisLineColor": "#999999",
+                        "showAlternateHGridColor": "0",
+                        "rotateLabels": "1",
+                        "slantLabels": "1",
+                        "showHoverEffect": "1",
+                        "canvasPadding": "10"
                     },
                     "data": parsed,
                     "trendlines": [{

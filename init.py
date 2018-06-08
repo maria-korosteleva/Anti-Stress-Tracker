@@ -27,13 +27,19 @@ def stress_score():
 
         # calc todays stats
         today = dt.datetime.now().date()
-        interval = dt.timedelta(minutes=15)
+        min_interval = dt.timedelta(minutes=15)
 
-        today_stats = SS.get_stat_score(today, today + dt.timedelta(1), interval)
+        today_stats = SS.get_stat_score(today, today + dt.timedelta(1), min_interval)
         today_stats = [{"label": stat.datetime.time().__str__()[:-3], "value": stat.value} for stat in today_stats]
 
+        week_start = today - dt.timedelta(7)
+        hour_interval = dt.timedelta(hours=2)
+
+        week_stats = SS.get_stat_score(week_start, today + dt.timedelta(1), hour_interval)
+        week_stats = [{"label": stat.datetime.__str__()[:-3], "value": stat.value} for stat in week_stats]
+
         return render_template('index.html', score=score.value, datetime=score.datetime, sleep=score.sleep,
-                               stats=today_stats, today=today)
+                               today_stats=today_stats, week_stats=week_stats, today=today)
 
     except fitbit.exceptions.HTTPTooManyRequests as exc:
         message = "Retry after " + str(exc.retry_after_sec / 60) + " minutes"
