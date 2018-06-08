@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Anti-Stree-Tracker</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+
+    <meta http-equiv="Content-Type" content="text/html">
+    <meta charset="utf-8" http-equiv="X-UA-Compatible" content="IE=edge, chrome=1"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.js"></script>
+    <script type="text/javascript"
+            src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.fint.js?cacheBust=56"></script>
+    <script type="text/javascript">
+        FusionCharts.ready(function () {
+            var fusioncharts = new FusionCharts({
+                    type: 'hlineargauge',
+                    renderAt: 'chart-container',
+                    id: 'cpu-linear-gauge-1',
+                    width: '650',
+                    height: '150',
+                    dataFormat: 'json',
+                    dataSource: {
+                        "chart": {
+                            "theme": "fint",
+                            "caption": "Current Stress Score",
+                            "captionFontSize": "25",
+                            {#"subcaption": "food.hsm.com",#}
+                            "lowerLimit": "0",
+                            "upperLimit": "750",
+                            {#"numberSuffix": "%",#}
+                            "chartBottomMargin": "20",
+                            "valueFontSize": "20",
+                            "valueFontBold": "0",
+                            "labelFontSize": "18",
+                        },
+                        "colorRange": {
+                            "color": [{
+                                "minValue": "0",
+                                "maxValue": "30",
+                                "code": "#f0fff1",
+                                "label": "Mild stress",
+                            }, {
+                                "minValue": "30",
+                                "maxValue": "200",
+                                "code": "#64ffcd",
+                                "label": "Calm",
+                            }, {
+                                "minValue": "200",
+                                "maxValue": "500",
+                                "code": "#f3ff16",
+                                "label": "Mild stress",
+                            }, {
+                                "minValue": "500",
+                                "maxValue": "750",
+                                "code": "#ff854c",
+                                "label": "Danger",
+                            }]
+                        },
+                        "pointers": {
+                            "pointer": [{
+                                "value": {{ score }}
+                                {#"value": "180"#}
+                            }]
+                        }
+                    }
+                }
+            );
+            fusioncharts.render();
+        });
+
+        var TabBlock = {
+            s: {
+                animLen: 200
+            },
+
+            init: function () {
+                TabBlock.bindUIActions();
+                TabBlock.hideInactive();
+            },
+
+            bindUIActions: function () {
+                $('.tabBlock-tabs').on('click', '.tabBlock-tab', function () {
+                    TabBlock.switchTab($(this));
+                });
+            },
+
+            hideInactive: function () {
+                var $tabBlocks = $('.tabBlock');
+
+                $tabBlocks.each(function (i) {
+                    var
+                        $tabBlock = $($tabBlocks[i]),
+                        $panes = $tabBlock.find('.tabBlock-pane'),
+                        $activeTab = $tabBlock.find('.tabBlock-tab.is-active');
+
+                    $panes.hide();
+                    $($panes[$activeTab.index()]).show();
+                });
+            },
+
+            switchTab: function ($tab) {
+                var $context = $tab.closest('.tabBlock');
+
+                if (!$tab.hasClass('is-active')) {
+                    $tab.siblings().removeClass('is-active');
+                    $tab.addClass('is-active');
+
+                    TabBlock.showPane($tab.index(), $context);
+                }
+            },
+
+            showPane: function (i, $context) {
+                var $panes = $context.find('.tabBlock-pane');
+
+                // Normally I'd frown at using jQuery over CSS animations, but we can't transition between unspecified variable heights, right? If you know a better way, I'd love a read it in the comments or on Twitter @johndjameson
+                $panes.slideUp(TabBlock.s.animLen);
+                $($panes[i]).slideDown(TabBlock.s.animLen);
+            }
+        };
+
+        $(function () {
+            TabBlock.init();
+        });
+    </script>
+</head>
+
+<body class="default">
+    <figure class="tabBlock">
+        <ul class="tabBlock-tabs">
+            <li class="tabBlock-tab is-active">Now</li>
+            <li class="tabBlock-tab">Today</li>
+            <li class="tabBlock-tab">Week</li>
+        </ul>
+        <div class="tabBlock-content">
+            <div class="tabBlock-pane">
+                {% if score <= 30 %}
+                    <img src="{{ url_for('static', filename='img/low.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% elif score <= 200 %}
+                    <img src="{{ url_for('static', filename='img/calm.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% elif score <= 500 %}
+                    <img src="{{ url_for('static', filename='img/mid.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% else %}
+                    <img src="{{ url_for('static', filename='img/high.gif') }}" width="400px" height="400px"
+                         id="status-gif"/>
+                {% endif %}
+                <div id="chart-container">Stress score gauge will load here!</div>
+                <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
+
+            </div>
+
+            <div class="tabBlock-pane">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias molestiae atque quis blanditiis
+                    eaque maiores ducimus optio neque debitis quos dolorum odit unde quibusdam tenetur quaerat magni
+                    eius quod tempore.</p>
+            </div>
+
+            <div class="tabBlock-pane">
+                <ul>
+                    <li>Lorem ipsum dolor sit amet.</li>
+                    <li>Minima mollitia tenetur nesciunt modi?</li>
+                    <li>Id sint fugit et sapiente.</li>
+                    <li>Nam deleniti libero obcaecati pariatur.</li>
+                    <li>Nemo optio iste labore similique?</li>
+                </ul>
+            </div>
+        </div>
+    </figure>
+</body>
+</html>

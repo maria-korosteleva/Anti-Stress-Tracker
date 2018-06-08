@@ -6,6 +6,7 @@ import time
 
 config_filename = 'config.ini'
 
+
 # start_time and end_time should both be empty or both set
 # returns heartrate stats for a dayrange with start_date included, end_date excluded
 def get_heartrate_series(base_date, detail_level, start_time=None, end_time=None):
@@ -33,7 +34,7 @@ def get_sleep_ranges(start_date, end_date):
     client = __get_client()
     beauty_stats = []
     for day_number in range((end_date - start_date).days):
-        base_date = start_date+dt.timedelta(day_number)
+        base_date = start_date + dt.timedelta(day_number)
         stats = client.sleep(date=base_date)['sleep']
         for elem in stats:
             start = dt.datetime.strptime(elem['startTime'].split('.')[0], "%Y-%m-%dT%H:%M:%S")
