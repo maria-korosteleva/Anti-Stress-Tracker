@@ -135,15 +135,15 @@ def __stress_score(hr):
         return 0  # give up to calculate the score to prevent division by zero
 
     # naive calculations, might be improved
-    min = 200
-    max = 0
+    min_r_r = 200
+    max_r_r = 0
     mode = 0
     mode_freq = 0
     for record in r_r:
-        if record < min:
-            min = record
-        if record > max:
-            max = record
+        if record < min_r_r:
+            min_r_r = record
+        if record > max_r_r:
+            max_r_r = record
         freq = r_r.count(record)
         if freq > mode_freq:
             mode_freq = freq
@@ -152,10 +152,10 @@ def __stress_score(hr):
     # print r_r
     # print min, max, mode, mode_freq
 
-    VR = max - min
+    VR = max_r_r - min_r_r
     Amode = mode_freq / float(len(r_r)) * 100
 
     if abs(VR) < 0.0001:
         return 0  # give up to calculate the score to prevent division by zero
 
-    return round(Amode / (2 * VR * mode))
+    return min(1000, round(Amode / (2 * VR * mode)))

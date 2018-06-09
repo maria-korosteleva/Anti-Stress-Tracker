@@ -11,6 +11,31 @@
     margin-right: auto;
 }
 
+#low-box {
+    background-color: #f0fff1;
+}
+
+#calm-box {
+    background-color: #99ffdf;
+}
+
+#mid-box {
+    background-color: #f3ff16;
+}
+
+#high-box {
+    background-color: #ff854c;
+}
+
+.stress-box {
+    border: 1px solid #d8d8d8;
+    border-radius: 2px;
+    height: 100px;
+    /*line-height: 100px;*/
+    padding: 17px;
+    text-align: center;
+}
+
 .group::after, .tabBlock-tabs::after {
     clear: both;
     content: "";

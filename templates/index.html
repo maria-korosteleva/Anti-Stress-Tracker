@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Anti-Stree-Tracker</title>
+    <title>Anti-Stress-Tracker</title>
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
 
@@ -13,7 +13,6 @@
     <script type="text/javascript"
             src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.fint.js?cacheBust=56"></script>
     <script type="text/javascript">
-
         {# https://www.fusioncharts.com/dev/chart-guide/gauges-and-widgets/linear-gauge #}
         {# Current stress score gauge chart #}
         FusionCharts.ready(function () {
@@ -85,12 +84,99 @@
                 dataFormat: 'json',
                 dataSource: {
                     "chart": {
-                        "caption": "Today's Stress Score",
+                        "caption": "Today's Stress Statistics",
                         "captionFontSize": "25",
                         "subCaption": "{{ today }}",
                         "subcaptionFontSize": "20",
-                        "yaxisminvalue": "1",
+                        "yaxisminvalue": "0",
                         "yaxismaxvalue": "1000",
+                        "lineThickness": "2",
+                        "paletteColors": "#0075c2",
+                        "baseFontColor": "#333333",
+                        "baseFont": "Helvetica Neue, Arial",
+                        "showBorder": "0",
+                        "bgColor": "#ffffff",
+                        "showShadow": "0",
+                        "canvasBgColor": "#ffffff",
+                        "canvasBorderAlpha": "0",
+                        "divlineAlpha": "100",
+                        "divlineColor": "#999999",
+                        "divlineThickness": "1",
+                        "divLineDashed": "1",
+                        "divLineDashLen": "1",
+                        "showXAxisLine": "1",
+                        "xAxisLineThickness": "1",
+                        "xAxisLineColor": "#999999",
+                        "xAxisName": "Time",
+                        "yAxisName": "Stress Score",
+                        "showAlternateHGridColor": "0",
+                        "rotateLabels": "1",
+                        "slantLabels": "1",
+                        "showHoverEffect": "1",
+                        "canvasPadding": "10",
+                        "showValues": "0",
+                        "connectNullData": "0"
+                    },
+                    "data": parsed,
+                    "trendlines": [{
+                        "line": [{
+                            "startvalue": "0",
+                            "endvalue": "30",
+                            "istrendzone": "1",
+                            "color": "#f0f7ff",
+                            "displayvalue": "Mild Stress",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "30",
+                            "endvalue": "200",
+                            "istrendzone": "1",
+                            "color": "#b3ffe7",
+                            "displayvalue": "Calm",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "200",
+                            "endvalue": "500",
+                            "istrendzone": "1",
+                            "color": "#faff99",
+                            "displayvalue": "Mild Stress",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "500",
+                            "endvalue": "1000",
+                            "istrendzone": "1",
+                            "color": "#ffb999",
+                            "displayvalue": "Danger",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }]
+                    }]
+                },
+            }).render();
+        });
+
+        {# https://www.fusioncharts.com/dev/demos/chart-gallery#chart=3 #}
+        {# Week's stress score gauge chart #}
+        FusionCharts.ready(function () {
+            var parsed = JSON.parse('{{ week_stats | tojson }}')
+            var weekAvgBallChart = new FusionCharts({
+                type: 'line',
+                renderAt: 'week-chart-container',
+                width: '100%',
+                height: '550',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "caption": "Stress Statistics Over Past 7 Days",
+                        "captionFontSize": "25",
+                        {#"subCaption": "{{ today }}",#}
+                        "subcaptionFontSize": "20",
+                        "yaxisminvalue": "0",
+                        "yaxismaxvalue": "1000",
+                        "xAxisName": "Time",
+                        "yAxisName": "Stress Score",
                         "lineThickness": "2",
                         "paletteColors": "#0075c2",
                         "baseFontColor": "#333333",
@@ -119,22 +205,34 @@
                     "data": parsed,
                     "trendlines": [{
                         "line": [{
-                            "startvalue": "50",
+                            "startvalue": "0",
+                            "endvalue": "30",
+                            "istrendzone": "1",
+                            "color": "#f0f7ff",
+                            "displayvalue": "Mild Stress",
+                            "valueOnRight": "1",
+                            "thickness": "1"
+                        }, {
+                            "startvalue": "30",
                             "endvalue": "200",
                             "istrendzone": "1",
-                            "color": "#5671ff",
+                            "color": "#b3ffe7",
                             "displayvalue": "Calm",
                             "valueOnRight": "1",
                             "thickness": "1"
                         }, {
                             "startvalue": "200",
-                            "color": "#ff822f",
+                            "endvalue": "500",
+                            "istrendzone": "1",
+                            "color": "#faff99",
                             "displayvalue": "Mild Stress",
                             "valueOnRight": "1",
                             "thickness": "1"
                         }, {
                             "startvalue": "500",
-                            "color": "#ff392b",
+                            "endvalue": "1000",
+                            "istrendzone": "1",
+                            "color": "#ffb999",
                             "displayvalue": "Danger",
                             "valueOnRight": "1",
                             "thickness": "1"
@@ -144,72 +242,14 @@
             }).render();
         });
 
-        {# https://www.fusioncharts.com/dev/demos/chart-gallery#chart=3 #}
-        {# Week's stress score gauge chart #}
-        FusionCharts.ready(function () {
-            var parsed = JSON.parse('{{ week_stats | tojson }}')
-            var weekAvgBallChart = new FusionCharts({
-                type: 'line',
-                renderAt: 'week-chart-container',
-                width: '100%',
-                height: '550',
-                dataFormat: 'json',
-                dataSource: {
-                    "chart": {
-                        "caption": "Week's Stress Score",
-                        "captionFontSize": "25",
-                        "subCaption": "{{ today }}",
-                        "subcaptionFontSize": "20",
-                        "yaxisminvalue": "0",
-                        "yaxismaxvalue": "1000",
-                        "lineThickness": "2",
-                        "paletteColors": "#0075c2",
-                        "baseFontColor": "#333333",
-                        "baseFont": "Helvetica Neue, Arial",
-                        "showBorder": "0",
-                        "bgColor": "#ffffff",
-                        "showShadow": "0",
-                        "canvasBgColor": "#ffffff",
-                        "canvasBorderAlpha": "0",
-                        "divlineAlpha": "100",
-                        "divlineColor": "#999999",
-                        "divlineThickness": "1",
-                        "divLineDashed": "1",
-                        "divLineDashLen": "1",
-                        "showXAxisLine": "1",
-                        "xAxisLineThickness": "1",
-                        "xAxisLineColor": "#999999",
-                        "showAlternateHGridColor": "0",
-                        "rotateLabels": "1",
-                        "slantLabels": "1",
-                        "showHoverEffect": "1",
-                        "canvasPadding": "10"
-                    },
-                    "data": parsed,
-                    "trendlines": [{
-                        "line": [{
-                            "startvalue": "50",
-                            "color": "#5671ff",
-                            "displayvalue": "Calm",
-                            "valueOnRight": "1",
-                            "thickness": "1"
-                        }, {
-                            "startvalue": "200",
-                            "color": "#ff822f",
-                            "displayvalue": "Mild Stress",
-                            "valueOnRight": "1",
-                            "thickness": "1"
-                        }, {
-                            "startvalue": "500",
-                            "color": "#ff392b",
-                            "displayvalue": "Danger",
-                            "valueOnRight": "1",
-                            "thickness": "1"
-                        }]
-                    }]
-                },
-            }).render();
-        });
+
+
+
+
+
+
+
+
 
         var TabBlock = {
             s: {
@@ -279,17 +319,25 @@
                 {% if score <= 30 %}
                     <img src="{{ url_for('static', filename='img/low.gif') }}" width="400px" height="400px"
                          id="status-gif"/>
+                    <h3 align="center">Current Stress Score : {{ score }}</h3>
+                    <div id="low-box" class="stress-box"><b>Mild Stress</b><br>Go for a walk!</div>
                 {% elif score <= 200 %}
                     <img src="{{ url_for('static', filename='img/calm.gif') }}" width="400px" height="400px"
                          id="status-gif"/>
+                    <h3 align="center">Current Stress Score : {{ score }}</h3>
+                    <div id="calm-box" class="stress-box"><b>Calm</b><br>You are doing great!</div>
                 {% elif score <= 500 %}
                     <img src="{{ url_for('static', filename='img/mid.gif') }}" width="400px" height="400px"
                          id="status-gif"/>
+                    <h3 align="center">Current Stress Score : {{ score }}</h3>
+                    <div id="mid-box" class="stress-box"><b>Mild Stress</b><br>Go through 10 minute meditation</div>
                 {% else %}
                     <img src="{{ url_for('static', filename='img/high.gif') }}" width="400px" height="400px"
                          id="status-gif"/>
+                    <h3 align="center">Current Stress Score : {{ score }}</h3>
+                    <div id="high-box" class="stress-box"><b>Danger</b><br>Stop everything, watch a blockbuster movie</div>
                 {% endif %}
-                <div id="gauge-chart-container">Stress score gauge will load here!</div>
+{#                <div id="gauge-chart-container">Stress score gauge will load here!</div>#}
                 <p id="time-updated" align="right"><b>Time updated: {{ datetime }} </b></p>
 
             </div>

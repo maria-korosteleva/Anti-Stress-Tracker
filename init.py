@@ -36,10 +36,30 @@ def stress_score():
         hour_interval = dt.timedelta(hours=2)
 
         week_stats = SS.get_stat_score(week_start, today + dt.timedelta(1), hour_interval)
-        week_stats = [{"label": stat.datetime.__str__()[:-3], "value": stat.value} for stat in week_stats]
+        week_stats_result = []
+        for stat in week_stats:
+            dict = {}
+            if stat.datetime.hour == 2:
+                dict_vline = {}
+                dict_vline['label'] = stat.datetime.date().__str__()
+                dict_vline['vLine'] = '1'
+                dict_vline['dashed'] = '1'
+                dict_vline['dashLen'] = '1'
+                dict_vline['dashGap'] = '1'
+                dict_vline['showLabelBorder'] = '0'
+                dict_vline['thickness'] = '1'
+                week_stats_result.append(dict_vline)
+
+            dict['label'] = stat.datetime.time().__str__()[:-3]
+            # dict['label'] = stat.datetime.date().__str__() if stat.datetime.hour == 2 else stat.datetime.time().__str__()[:-3]
+
+            dict['value'] = stat.value
+
+            week_stats_result.append(dict)
+        # week_stats = [{"label": stat.datetime.__str__()[:-3], "value": stat.value} for stat in week_stats]
 
         return render_template('index.html', score=score.value, datetime=score.datetime, sleep=score.sleep,
-                               today_stats=today_stats, week_stats=week_stats, today=today)
+                               today_stats=today_stats, week_stats=week_stats_result, today=today)
 
     except fitbit.exceptions.HTTPTooManyRequests as exc:
         message = "Retry after " + str(exc.retry_after_sec / 60) + " minutes"
