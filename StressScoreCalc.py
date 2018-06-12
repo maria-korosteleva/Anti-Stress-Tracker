@@ -122,7 +122,8 @@ def __check_sleeping_records(timeseries, sleep_ranges):
 # returns estimated score for a given series of heartrate records or 0 if it cannot be estimated
 def __stress_score(hr):
     # see http://www.cardiometry.net/issues/no10-may-2017/heart-rate-variability-analysis
-    # originally from book https://www.twirpx.com/file/2327193/ (in Russian)
+    # originally from R.M. Bayevcky, O.I. Kirillov, S.Z. Kletskin.
+    # Mathematical analysis of Cardiac Rhythm under stress. In Hauka, 1984. [In Russian]
     # score = AMo / (2 * VR * Mo)
     # R-R interval - time delay between consecutive heart beats (assumed to be inverse value of the bpm)
     # Mo - mode - most frequent R-R interval value
