@@ -45,11 +45,12 @@ To make the application work with you personal records from your Fitbit, you nee
     
 You are all set, now you can run the server and see you stress level at http://127.0.0.1/5000
 
-##Stress estimation
+## Stress estimation
 Estimation of the stress level is based on the Baevsky Stress index formula, that 
 estimates stress level using heart rate variability.
-For reference see http://www.cardiometry.net/issues/no10-may-2017/heart-rate-variability-analysis
-originally from book https://www.twirpx.com/file/2327193/ (in Russian)
+For reference see http://www.cardiometry.net/issues/no10-may-2017/heart-rate-variability-analysis.
+Originally from R.M. Bayevcky, O.I. Kirillov, S.Z. Kletskin. Mathematical analysis of Cardiac Rhythm under stress. In Hauka, 1984. [In Russian]
+
 #### Formula
     sress_score = AMo / (2 * VR * Mo), 
     where
